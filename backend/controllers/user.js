@@ -20,6 +20,8 @@ const generateToken = (data) => {
     console.log(error.message);
   }
 };
+//m-post=>/signup
+
 const signup = async (req, res) => {
   try {
     console.log("signup user");
@@ -68,5 +70,17 @@ const signup = async (req, res) => {
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
+//m-post=>/login
+const login = async (req, res) => {
+  console.log({ req });
+  console.log({ res });
 
-module.exports = { signup };
+  return res.send({
+    message: "success",
+    token: req.token,
+    userId: req.id,
+    premium: req.premium,
+  });
+};
+
+module.exports = { signup, login };
