@@ -1,3 +1,23 @@
+const dotenv = require("dotenv");
+dotenv.config();
+const sequelize = require("./db/connection");
+const userRouter = require("./routes/user");
 const express = require("express");
 const app = express();
-app.listen(3000, () => console.log("listening at port 3000"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(userRouter);
+sequelize
+  .sync()
+  .then(() => {
+    app.listen(4000, (err) => {
+      if (err) {
+        console.log(err.message);
+        return;
+      }
+      console.log("listening at port 4000");
+    });
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });
