@@ -24,36 +24,6 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
-    const user = JSON.parse(localStorage.getItem("user")) || [];
-    if (user.length === 0) {
-      alert("invalid credentials");
-      return;
-    }
-    const name = formData.name;
-    let index = -1;
-    for (let i = 0; i < user.length; i++) {
-      if (user[i].name === name) {
-        index = i;
-        break;
-      }
-    }
-    if (index === -1) {
-      alert("invalid credentials");
-      return;
-    }
-
-    if (user[index].password === formData.password) {
-      alert("login successfull");
-      localStorage.setItem("login", "true");
-      setFormData({
-        name: "",
-        password: "",
-      });
-      navigate("/dashboard");
-    } else {
-      alert("invalid credentials");
-      return;
-    }
   };
   return (
     <>
