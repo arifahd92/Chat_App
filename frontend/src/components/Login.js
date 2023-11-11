@@ -1,32 +1,67 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+
+import { EyeFill, EyeSlashFill } from "react-bootstrap-icons"; // Import Bootstrap Icons
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
-export default function Login() {
-  const [showPassword, setShowPassword] = useState(false);
+
+function Login() {
   const [formData, setFormData] = useState({
-    name: "",
+    email: "",
     password: "",
   });
+
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  useEffect(() => {
-    const login = JSON.parse(localStorage.getItem("login") || false);
-    if (login) {
-      navigate("/dashboard");
-    }
-  });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/login",
+        formData
+      );
+
+      if (response.status !== 200) {
+        alert("Something went wrong");
+        return;
+      }
+      console.log(response);
+      const { token } = response.data;
+      const premium = response.data.premium;
+      const userId = response.data.userId.toString();
+      localStorage.setItem("userToken", token);
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("userEmail", formData.email);
+      localStorage.setItem("premium", JSON.stringify(premium));
+      alert("success");
+      setFormData({ email: "", password: "" });
+      navigate(`/expense`);
+    } catch (err) {
+      //response object will be stored in err variable of catch
+      if (err.response) {
+        console.log(err.response.data.error);
+        alert(err.response.data.error);
+        return;
+      }
+      alert(err.message);
+    }
   };
+
   return (
-    <>
+    <div>
       <div className="container mt-5 d-flex justify-content-center">
         <h2 className="text-secondary">Login</h2>
       </div>
@@ -35,16 +70,16 @@ export default function Login() {
           <div className="col-md-10 offset-md-1 col-lg-8  col-xl-6 offset-xl-3 offset-lg-2 text-secondary">
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label htmlFor="name">Name:</label>
+                <label htmlFor="email">Email:</label>
                 <input
                   required
-                  type="name"
+                  type="email"
                   className="form-control"
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter your name"
+                  placeholder="Enter your email"
                 />
               </div>
               <div className="form-group">
@@ -70,11 +105,16 @@ export default function Login() {
                   </div>
                 </div>
               </div>
-              <div className="d-flex  justify-content-center text-primary">
+              <div className="d-flex  justify-content-around text-primary">
                 <div
                   className="signup  border-bottom  cursor-pointer"
-                  onClick={() => navigate("/signup")}>
+                  onClick={() => navigate("/register")}>
                   Not registered yet?
+                </div>
+                <div
+                  className="signup  border-bottom  cursor-pointer"
+                  onClick={() => navigate("/password/forgot")}>
+                  Forgot password?
                 </div>
               </div>
 
@@ -85,6 +125,8 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
+
+export default Login;
