@@ -33,7 +33,7 @@ function Signup() {
         "http://localhost:4000/signup",
         formData
       );
-      
+
       console.log(response.status);
       if (response.status !== 200) {
         alert("Something went wrong");
@@ -44,10 +44,11 @@ function Signup() {
       localStorage.setItem("userToken", data.token);
       localStorage.setItem("userId", data.id);
       localStorage.setItem("userEmail", formData.email);
+      localStorage.setItem("userEmail", formData.name);
       //localStorage.setItem("premium", JSON.stringify(response.data.premium));
       alert("success");
       setFormData({ name: "", email: "", password: "" });
-      navigate("/expense");
+      navigate("/");
     } catch (err) {
       console.log(err.response.data.error);
       alert(err.response.data.error);

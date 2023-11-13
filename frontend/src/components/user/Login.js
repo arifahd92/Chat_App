@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   EnvelopeFill,
@@ -25,7 +25,12 @@ function Login() {
       [name]: value,
     });
   };
-
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    if (token) {
+      navigate("/chatapp");
+    }
+  });
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
@@ -45,7 +50,7 @@ function Login() {
       }
       console.log(response);
       const { token, userName } = response.data;
-      const name = response.data.userName;
+      //const name = response.data.userName;
       const userId = response.data.userId.toString();
       localStorage.setItem("userToken", token);
       localStorage.setItem("userId", userId);

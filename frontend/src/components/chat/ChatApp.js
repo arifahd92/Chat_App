@@ -1,10 +1,13 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { SendExclamation } from "react-bootstrap-icons";
+import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 
 const ChatApp = () => {
   const [users, setUsers] = useState([]);
-
+  const [chat, setChat] = useState("");
+  const navigate = useNavigate();
   useEffect(() => {
     // Connect to the server using Socket.io
     const socket = io("http://localhost:4000");
@@ -28,6 +31,35 @@ const ChatApp = () => {
       socket.disconnect();
     };
   }, [users]); // Run this effect whenever the list of users changes
+
+  const hanndleSendMessage = async () => {
+    if (!chat) {
+      return;
+    }
+    try {
+      const token = localStorage.getItem("userToken");
+      const response = await axios.post(
+        "http://localhost:4000/chat",
+        { message: chat },
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+      console.log({ status: response.status });
+      console.log(response.data);
+    } catch (error) {
+      // Handle the error
+      console.log(error.response.status);
+      if (error.response?.status === 401) {
+        alert("token expired login again");
+        localStorage.removeItem("userToken");
+        navigate("/");
+      }
+      console.error("Error:", error.message);
+    }
+  };
 
   return (
     <>
@@ -66,8 +98,10 @@ const ChatApp = () => {
                 type="text"
                 className="form-control bg-body-secondary"
                 placeholder="Type here..."
+                onChange={(e) => setChat(e.target.value)}
               />
               <button
+                onClick={hanndleSendMessage}
                 className="btn btn-danger border border-black"
                 type="button">
                 <SendExclamation />
