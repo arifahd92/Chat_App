@@ -3,10 +3,13 @@ dotenv.config();
 const cors = require("cors");
 const sequelize = require("./db/connection");
 const userRouter = require("./routes/user");
+const chatRouter = require("./routes/chat");
 const express = require("express");
 const app = express();
 const http = require("http");
 const socketIo = require("socket.io");
+const User = require("./modals/user");
+const Chat = require("./modals/chat");
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
@@ -21,7 +24,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+User.hasMany(Chat);
+Chat.belongsTo(User);
 app.use(userRouter);
+app.use(chatRouter);
 const users = {};
 io.on("connection", (socket) => {
   console.log(

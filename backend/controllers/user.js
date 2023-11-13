@@ -5,7 +5,7 @@ const User = require("../modals/user");
 
 const saltRounds = 10;
 
-const secretKey = process.env.JWT_TOKEN;
+const secretKey = process.env.SECRET_KEY;
 
 const generateToken = (data) => {
   try {
@@ -15,6 +15,7 @@ const generateToken = (data) => {
     const token = jwt.sign({ id, email }, secretKey, {
       expiresIn: "112h",
     });
+    console.log({ token });
     return token;
   } catch (error) {
     console.log(error.message);
@@ -47,7 +48,6 @@ const signup = async (req, res) => {
           name,
           email,
           password: hashedPassword,
-          premium: false,
         });
         console.log("im data");
         console.log(data.dataValues);
@@ -56,7 +56,6 @@ const signup = async (req, res) => {
           message: "Success",
           token,
           id: data.dataValues.id,
-          premium: data.dataValues.premium,
         });
       } catch (error) {
         console.error(error);
