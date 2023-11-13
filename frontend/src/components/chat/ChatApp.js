@@ -7,6 +7,8 @@ import io from "socket.io-client";
 const ChatApp = () => {
   const [users, setUsers] = useState([]);
   const [chat, setChat] = useState("");
+  const [user, setUser] = useState("");
+  const [allChat, setAllChat] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     // Connect to the server using Socket.io
@@ -31,7 +33,23 @@ const ChatApp = () => {
       socket.disconnect();
     };
   }, [users]); // Run this effect whenever the list of users changes
+  //get messages
+  useEffect(() => {
+    setTimeout(async () => {
+      const token = localStorage.getItem("userToken");
+      const userName = localStorage.getItem("userName");
+      const response = await axios.get("http://localhost:4000/chat", {
+        headers: {
+          Authorization: token,
+        },
+      });
+      const data = response.data;
 
+      console.log(data);
+      setAllChat(data);
+      setUser(userName);
+    }, 10000);
+  }, [allChat]);
   const hanndleSendMessage = async () => {
     if (!chat) {
       return;
@@ -60,7 +78,37 @@ const ChatApp = () => {
       console.error("Error:", error.message);
     }
   };
+  // extract date
+  const extractDate = () => {
+    const timestampString = "2023-11-13T18:58:38.241Z";
+    const timestamp = new Date(timestampString);
 
+    // Get UTC year, month, and day
+    const yearUTC = timestamp.getUTCFullYear();
+    const monthUTC = timestamp.getUTCMonth() + 1; // Months are zero-based, so add 1
+    const dayUTC = timestamp.getUTCDate();
+
+    // Format the UTC date
+    const formattedUTCDate = `${yearUTC}-${
+      monthUTC < 10 ? "0" + monthUTC : monthUTC
+    }-${dayUTC < 10 ? "0" + dayUTC : dayUTC}`;
+
+    console.log(formattedUTCDate);
+    return formattedUTCDate;
+  };
+  // extract time
+  const extractTime = (timestampString) => {
+    // const timestampString = "2023-11-13T18:58:38.241Z";
+    const timestamp = new Date(timestampString);
+
+    // Get hours, minutes, and seconds
+    const hours = timestamp.getHours();
+    const minutes = timestamp.getMinutes();
+    const seconds = timestamp.getSeconds();
+
+    // Format the time
+    return `${hours}:${minutes}:${seconds}`;
+  };
   return (
     <>
       <div
@@ -86,7 +134,39 @@ const ChatApp = () => {
             </ul>
           </div>
         </div>
+        <div className="row mb-5">
+          {allChat.map((item) => {
+            return (
+              <>
+                <div className="col-12 ">
+                  <div
+                    className={`card message-card w-50 mb-2 ${
+                      item.user.name == user ? "float-end" : "float-start"
+                    }`}
+                    style={{ float: "right" }}>
+                    <div className="card-body">
+                      <div className=" d-flex justify-content-between">
+                        <div className="card-title text-primary user-name">
+                          {item.user.name}
+                        </div>
+                        <div className="card-text message-date">
+                          {extractTime(item.createdAt)}
+                        </div>
+                      </div>
+                      <hr />
+                      <div className="card-text message-content">
+                        {item.message}
+                      </div>
+                      <div className="  text-end">{extractDate()}</div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          })}
+        </div>
       </div>
+
       <div
         className="container border border-danger d-flex justify-content-center align-items-end"
         style={{ position: "fixed", bottom: "0px", left: "100px" }}>
