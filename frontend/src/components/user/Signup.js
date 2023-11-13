@@ -33,7 +33,7 @@ function Signup() {
         "http://localhost:4000/signup",
         formData
       );
-      // Assuming that you expect a status code in the response, check it like this:
+      
       console.log(response.status);
       if (response.status !== 200) {
         alert("Something went wrong");

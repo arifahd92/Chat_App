@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 
-import { EyeFill, EyeSlashFill } from "react-bootstrap-icons"; // Import Bootstrap Icons
+import {
+  EnvelopeFill,
+  EyeFill,
+  EyeSlashFill,
+  LockFill,
+} from "react-bootstrap-icons"; // Import Bootstrap Icons
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -39,16 +44,16 @@ function Login() {
         return;
       }
       console.log(response);
-      const { token } = response.data;
-      const premium = response.data.premium;
+      const { token, userName } = response.data;
+      const name = response.data.userName;
       const userId = response.data.userId.toString();
       localStorage.setItem("userToken", token);
       localStorage.setItem("userId", userId);
       localStorage.setItem("userEmail", formData.email);
-      localStorage.setItem("premium", JSON.stringify(premium));
+      localStorage.setItem("userName", userName);
       alert("success");
       setFormData({ email: "", password: "" });
-      navigate(`/expense`);
+      navigate(`/chatapp`);
     } catch (err) {
       //response object will be stored in err variable of catch
       if (err.response) {
@@ -71,20 +76,28 @@ function Login() {
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="email">Email:</label>
-                <input
-                  required
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                />
+                <div class="input-group">
+                  <span className="input-group-text" id="email-prepend">
+                    <EnvelopeFill />
+                  </span>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    name="email"
+                    aria-describedby="email-prepend"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email"
+                  />
+                </div>
               </div>
               <div className="form-group">
                 <label htmlFor="password">Password:</label>
                 <div className="input-group">
+                  <span className="input-group-text" id="email-prepend">
+                    <LockFill />
+                  </span>
                   <input
                     required
                     type={showPassword ? "text" : "password"}
@@ -95,14 +108,12 @@ function Login() {
                     onChange={handleChange}
                     placeholder="Enter your password"
                   />
-                  <div className="input-group-append border bg-white">
-                    <button
-                      className="btn btn-outline-none"
-                      type="button"
-                      onClick={handleTogglePassword}>
-                      {showPassword ? <EyeSlashFill /> : <EyeFill />}
-                    </button>
-                  </div>
+                  <span
+                    className="input-group-text"
+                    id="email-prepend"
+                    onClick={handleTogglePassword}>
+                    {showPassword ? <EyeSlashFill /> : <EyeFill />}
+                  </span>
                 </div>
               </div>
               <div className="d-flex  justify-content-around text-primary">
