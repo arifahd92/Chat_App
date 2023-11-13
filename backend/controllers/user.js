@@ -72,14 +72,15 @@ const signup = async (req, res) => {
 };
 //m-post=>/login
 const login = async (req, res) => {
-  console.log({ req });
-  console.log({ res });
+  // console.log({ req });
+  // console.log({ res });
+  console.log(req.name, "from user");
 
   return res.send({
     message: "success",
     token: req.token,
     userId: req.id,
-    premium: req.premium,
+    userName: req.name,
   });
 };
 

@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 //const cookie = require("cookie");
 const User = require("../modals/user");
-const secretKey = process.env.JWT_TOKEN;
+const secretKey = process.env.SECRET_KEY;
 const generateToken = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -26,7 +26,7 @@ const generateToken = async (req, res, next) => {
           // password mtched
           console.log(result); //true
           const token = jwt.sign(
-            { id: exists.id, email: req.body.email, premium: exists.premium },
+            { id: exists.id, email: req.body.email, name: exists.name },
             secretKey,
             {
               expiresIn: "112h",
@@ -34,10 +34,11 @@ const generateToken = async (req, res, next) => {
           );
           console.log(token);
 
-          // console.log (exists);
+          console.log(exists.name, " from middleware");
           req.token = token;
           req.id = exists.id;
-          req.premium = exists.premium;
+          req.name = exists.name;
+
           next();
         }
         if (!result) {
