@@ -1,56 +1,61 @@
+// FloatingScreen.js
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
-import { SendExclamation, Whatsapp } from "react-bootstrap-icons";
-//import "./App.css"; // Import your custom CSS file for additional styling if needed
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+const FloatingScreen = ({ groups }) => {
+  const [open, setOpen] = React.useState(false);
 
-const ChatUI = () => {
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
-    <>
-      <div
-        className="container  bg-dark-subtle border border-black"
-        style={{ minHeight: "100vh", boxSizing: "border-box" }}>
-        <div className="row text-center">
-          <h1>Chat App</h1>
-        </div>
-        <div className="row">
-          {/* Scrollable List at the Top */}
-          <div className="col-md-12 scrollable-list overflow-auto">
-            {/* Your scrollable list content goes here */}
-            <ul className="list-group">
-              <li className="list-group-item">Item 1</li>
-              <li className="list-group-item">Item 2</li>
-              <li className="list-group-item">Item 3</li>
-              <li className="list-group-item">Item 1</li>
-              <li className="list-group-item">Item 2</li>
-              <li className="list-group-item">Item 3</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div className="container border border-danger  d-flex justify-content-center align-items-center ">
-        <div
-          className="row  border border-black  "
-          style={{ position: "fixed", bottom: "0px" }}>
-          {/* Fixed Input Box at the Bottom */}
-          <div className="col-12 col-md-9 ">
-            <div className="input-group  ">
-              <input
-                type="text"
-                className="form-control bg-body-secondary"
-                placeholder="Type here..."
-              />
+    <div>
+      <IconButton
+        onClick={handleOpen}
+        edge="start"
+        color="inherit"
+        aria-label="menu">
+        <MenuIcon />
+      </IconButton>
 
-              <button
-                className="btn btn-danger border border-black"
-                type="button">
-                <SendExclamation />
-              </button>
-            </div>
-          </div>
+      <Drawer anchor="left" open={open} onClose={handleClose}>
+        <div
+          style={{
+            width: "20vw", // 20% of viewport width
+            height: "100vh", // 100% of viewport height
+            backgroundColor: "red", // Set your desired background color
+          }}>
+          {/* Your floating screen content goes here */}
+          <h2>your group </h2>
+
+          <List>
+            <ListItem>
+              <ListItemText
+                primary="groups"
+                onClick={() => console.log("first")}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="create a group" />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="group 3" />
+            </ListItem>
+          </List>
+          <button onClick={handleClose}>Close</button>
         </div>
-      </div>
-    </>
+      </Drawer>
+    </div>
   );
 };
 
-export default ChatUI;
+export default FloatingScreen;

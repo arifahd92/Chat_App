@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+//this will be used to prevent unauthorize access of chaptapp component
 const Protect = ({ Component }) => {
   //const [request, setRequest] = useState(true);
   const navigate = useNavigate();

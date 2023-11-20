@@ -1,8 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { SendExclamation } from "react-bootstrap-icons";
+import { Send } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
+
+import FloatingScreen from "./ChatUI";
 
 const ChatApp = () => {
   const [users, setUsers] = useState([]);
@@ -38,7 +40,7 @@ const ChatApp = () => {
     setTimeout(async () => {
       const token = localStorage.getItem("userToken");
       const userName = localStorage.getItem("userName");
-      const response = await axios.get("http://localhost:4000/chat", {
+      const response = await axios.get("http://localhost:4000/common-message", {
         headers: {
           Authorization: token,
         },
@@ -57,7 +59,7 @@ const ChatApp = () => {
     try {
       const token = localStorage.getItem("userToken");
       const response = await axios.post(
-        "http://localhost:4000/chat",
+        "http://localhost:4000/common-message",
         { message: chat },
         {
           headers: {
@@ -79,8 +81,7 @@ const ChatApp = () => {
     }
   };
   // extract date
-  const extractDate = () => {
-    const timestampString = "2023-11-13T18:58:38.241Z";
+  const extractDate = (timestampString) => {
     const timestamp = new Date(timestampString);
 
     // Get UTC year, month, and day
@@ -109,55 +110,58 @@ const ChatApp = () => {
     // Format the time
     return `${hours}:${minutes}:${seconds}`;
   };
+  const handleListItemClick = (message) => {
+    // Set the selected message and show options div
+    // setSelectedMessage(message);
+    //setShowOptions(true);
+  };
+
+  const handleEditClick = () => {
+    // Handle edit action
+    // You can perform any logic you need for editing here
+    console.log("Edit clicked for message:");
+  };
+
+  const handleDeleteClick = () => {
+    // Handle delete action
+    // You can perform any logic you need for deleting here
+    console.log("Delete clicked for message:");
+  };
   return (
     <>
       <div
         className="container  bg-dark-subtle border border-black d-flex flex-column"
         style={{ minHeight: "100vh", boxSizing: "border-box" }}>
         <div className="row text-center">
+          <FloatingScreen />
           <h1>Chat App</h1>
         </div>
-        <div className="row flex-grow-1">
-          {/* Scrollable List at the Top */}
-          <div className="col-md-12 scrollable-list overflow-auto">
-            {/* Your scrollable list content goes here */}
-            <ul className="list-group">
-              {users.map((item, index) => {
-                return (
-                  <>
-                    <li className="list-group-item m-2 text-center" key={index}>
-                      {item} joined the chat
-                    </li>
-                  </>
-                );
-              })}
-            </ul>
+
+        <div className="row mb-5 shadow border border-black ">
+          <div className="heading bg-body-secondary bg-secondary border border-danger-subtle">
+            <div className="">groupe name</div>
           </div>
-        </div>
-        <div className="row mb-5">
           {allChat.map((item) => {
             return (
               <>
-                <div className="col-12 ">
+                <div key={item.id} className="col-12 ">
                   <div
-                    className={`card message-card w-50 mb-2 ${
+                    className={`card   w-75  mb-2 ${
                       item.user.name == user ? "float-end" : "float-start"
-                    }`}
-                    style={{ float: "right" }}>
+                    }`}>
+                    <div className="card-header">
+                      <strong>{item.user.name}</strong>{" "}
+                      <span className="text float-end">
+                        {extractDate(item.createdAt)}
+                      </span>
+                    </div>
+
                     <div className="card-body">
-                      <div className=" d-flex justify-content-between">
-                        <div className="card-title text-primary user-name">
-                          {item.user.name}
-                        </div>
-                        <div className="card-text message-date">
-                          {extractTime(item.createdAt)}
-                        </div>
+                      <div className="card-text">{item.commonMessage}</div>
+                      <div className="  text-end">
+                        {" "}
+                        {extractTime(item.createdAt)}
                       </div>
-                      <hr />
-                      <div className="card-text message-content">
-                        {item.message}
-                      </div>
-                      <div className="  text-end">{extractDate()}</div>
                     </div>
                   </div>
                 </div>
@@ -184,7 +188,7 @@ const ChatApp = () => {
                 onClick={hanndleSendMessage}
                 className="btn btn-danger border border-black"
                 type="button">
-                <SendExclamation />
+                <Send />
               </button>
             </div>
           </div>
