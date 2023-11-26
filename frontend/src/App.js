@@ -7,6 +7,8 @@ import Protect from "./components/user/Protect";
 import ErrorPage from "./components/user/ErrorPage";
 
 import ChatApp from "./components/chat/ChatApp";
+import GroupChat from "./components/chat/GroupChat";
+import UserChat from "./components/chat/UserChat";
 
 export default function App() {
   return (
@@ -15,8 +17,10 @@ export default function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Signup />} />
 
-        <Route path="/*" element={<ErrorPage />} />
         <Route path="/chatapp" element={<Protect Component={ChatApp} />} />
+        <Route path="/GROUPS/:name/:id" element={<GroupChat />} />
+        <Route path="/USERS/:name/:id" element={<UserChat />} />
+        <Route path="/*" element={<ErrorPage />} />
       </Routes>
     </>
   );

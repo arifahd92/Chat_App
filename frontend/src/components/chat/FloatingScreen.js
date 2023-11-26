@@ -6,6 +6,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
+import SideList from "./SideList";
 const FloatingScreen = ({ groups }) => {
   const [open, setOpen] = React.useState(false);
 
@@ -18,7 +19,7 @@ const FloatingScreen = ({ groups }) => {
   };
 
   return (
-    <div>
+    <div style={{ marginLeft: "20px" }}>
       <IconButton
         onClick={handleOpen}
         edge="start"
@@ -27,31 +28,29 @@ const FloatingScreen = ({ groups }) => {
         <MenuIcon />
       </IconButton>
 
-      <Drawer anchor="left" open={open} onClose={handleClose}>
+      <Drawer
+        anchor="left"
+        open={open}
+        onClose={handleClose}
+        style={{ width: "300px" }}>
         <div
           style={{
-            width: "20vw", // 20% of viewport width
+            width: "300px",
             height: "100vh", // 100% of viewport height
             backgroundColor: "red", // Set your desired background color
           }}>
           {/* Your floating screen content goes here */}
-          <h2>your group </h2>
+          <SideList />
 
-          <List>
-            <ListItem>
-              <ListItemText
-                primary="groups"
-                onClick={() => console.log("first")}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="create a group" />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="group 3" />
-            </ListItem>
-          </List>
-          <button onClick={handleClose}>Close</button>
+          <div className="row">
+            <div className="col-2 offset-8">
+              <button
+                className="btn btn-outline-light mt-3"
+                onClick={handleClose}>
+                close{" "}
+              </button>
+            </div>
+          </div>
         </div>
       </Drawer>
     </div>

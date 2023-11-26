@@ -4,9 +4,10 @@ import { Send } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 
-import FloatingScreen from "./ChatUI";
+import FloatingScreen from "./FloatingScreen";
+import { Avatar, AvatarGroup } from "@mui/material";
 
-const ChatApp = () => {
+const ChatApp = ({ name, id, type, avatar }) => {
   const [users, setUsers] = useState([]);
   const [chat, setChat] = useState("");
   const [user, setUser] = useState("");
@@ -16,6 +17,7 @@ const ChatApp = () => {
     // Connect to the server using Socket.io
     const socket = io("http://localhost:4000");
     const name = localStorage.getItem("userName");
+    setUser(name);
 
     // Emit the "new-user-joined" event only if the user is not already in the list
     if (!users.includes(name)) {
@@ -69,6 +71,7 @@ const ChatApp = () => {
       );
       console.log({ status: response.status });
       console.log(response.data);
+      setChat(" ");
     } catch (error) {
       // Handle the error
       console.log(error.response.status);
@@ -116,13 +119,13 @@ const ChatApp = () => {
     //setShowOptions(true);
   };
 
-  const handleEditClick = () => {
+  const handleEditClick = (id, index) => {
     // Handle edit action
     // You can perform any logic you need for editing here
     console.log("Edit clicked for message:");
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (id, index) => {
     // Handle delete action
     // You can perform any logic you need for deleting here
     console.log("Delete clicked for message:");
@@ -130,26 +133,42 @@ const ChatApp = () => {
   return (
     <>
       <div
-        className="container  bg-dark-subtle border border-black d-flex flex-column"
+        className="container-fluid  bg-dark-subtle border border-black d-flex flex-column"
         style={{ minHeight: "100vh", boxSizing: "border-box" }}>
-        <div className="row text-center">
-          <FloatingScreen />
-          <h1>Chat App</h1>
+        <div
+          className="row text-center fixed-top bg-warning-subtle"
+          style={{ height: "50px" }}>
+          <div
+            className="col-auto col-md-2 m-1    text-center  d-flex justify-content-center align-items-center bg-body-tertiary "
+            style={{ borderLeft: "5px solid black" }}>
+            <FloatingScreen />
+          </div>
+          <div className="col border  display-6 d-flex justify-content-center align-items-center">
+            {avatar && <Avatar alt="Remy Sharp" src={`${avatar}`} />}{" "}
+            {name && name} {!name && "community group"}
+          </div>
+          <div className="col-auto col-md-2 m-1    text-center  d-flex justify-content-center align-items-center bg-body-tertiary "></div>
         </div>
 
-        <div className="row mb-5 shadow border border-black ">
-          <div className="heading bg-body-secondary bg-secondary border border-danger-subtle">
-            <div className="">groupe name</div>
-          </div>
-          {allChat.map((item) => {
+        <div
+          className="row shadow border border-black border border-danger "
+          style={{ marginBottom: "60px", marginTop: "48px" }}>
+          {allChat.map((item, ind) => {
             return (
               <>
-                <div key={item.id} className="col-12 ">
+                <div
+                  key={item.id}
+                  className="col-12  col-md-8 offset-md-2 bg-body-secondary  "
+                  onClick={() => handleEditClick(item.id, ind)}
+                  onDoubleClick={() => handleDeleteClick(item.id, ind)}>
                   <div
-                    className={`card   w-75  mb-2 ${
+                    className={`card   w-75  mb-2 mt-1 ${
                       item.user.name == user ? "float-end" : "float-start"
                     }`}>
-                    <div className="card-header">
+                    <div
+                      className={`card-header ${
+                        item.user.name == user ? "text-primary" : ""
+                      }`}>
                       <strong>{item.user.name}</strong>{" "}
                       <span className="text float-end">
                         {extractDate(item.createdAt)}
@@ -169,27 +188,27 @@ const ChatApp = () => {
             );
           })}
         </div>
-      </div>
-
-      <div
-        className="container border border-danger d-flex justify-content-center align-items-end"
-        style={{ position: "fixed", bottom: "0px", left: "100px" }}>
-        <div className="row w-100 border border-black">
+        <div className="row fixed-bottom  bg-body-secondary  p-2 ">
           {/* Fixed Input Box at the Bottom */}
-          <div className="col-12">
-            <div className="input-group">
-              <input
-                type="text"
-                className="form-control bg-body-secondary"
-                placeholder="Type here..."
-                onChange={(e) => setChat(e.target.value)}
-              />
-              <button
-                onClick={hanndleSendMessage}
-                className="btn btn-danger border border-black"
-                type="button">
-                <Send />
-              </button>
+
+          <div className="col-12 col-md-8 offset-md-2">
+            <div className="cont border border-danger p2 bg-primary-subtle">
+              <div className="input-group" style={{ height: "50px" }}>
+                <input
+                  type="text"
+                  className="form-control bg  bg-danger-subtle "
+                  placeholder="Type here..."
+                  onChange={(e) => setChat(e.target.value)}
+                  value={chat}
+                />
+                <button
+                  style={{ width: "50px" }}
+                  onClick={hanndleSendMessage}
+                  className="btn btn-danger border border-black"
+                  type="button">
+                  <Send />
+                </button>
+              </div>
             </div>
           </div>
         </div>
