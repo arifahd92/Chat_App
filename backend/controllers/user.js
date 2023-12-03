@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
 
 const jwt = require("jsonwebtoken");
-const User = require("../modals/user");
+const User = require("../modals/User");
+const { Sequelize } = require("sequelize");
 
 const saltRounds = 10;
 
@@ -21,6 +22,34 @@ const generateToken = (data) => {
     console.log(error.message);
   }
 };
+
+//m-get =>/user
+const getUser = async (req, res) => {
+  console.log("get user controller call called");
+  try {
+    const users = await User.findAll({
+      attributes: ["name", "email", "id"],
+      where: {
+        id: {
+          [Sequelize.Op.ne]: req.userId,
+        },
+      },
+    });
+    console.log(
+      "get user controller****************************************************",
+      users
+    );
+    if (users.length === 0) {
+      res.status(404).send({ error: "No users found" });
+    } else {
+      res.send(users);
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send({ error: `Internal server error: ${error.message}` });
+  }
+};
+
 //m-post=>/signup
 
 const signup = async (req, res) => {
@@ -83,4 +112,4 @@ const login = async (req, res) => {
   });
 };
 
-module.exports = { signup, login };
+module.exports = { signup, login, getUser };

@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 //const cookie = require("cookie");
-const User = require("../modals/user");
+const User = require("../modals/User");
 const secretKey = process.env.SECRET_KEY;
 const generateToken = async (req, res, next) => {
   try {

@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../modals/user");
+const User = require("../modals/User");
 
 //m-get=>/authorization
 const authorization = async (req, res, next) => {
