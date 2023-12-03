@@ -7,7 +7,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import SideList from "./SideList";
-const FloatingScreen = ({ groups }) => {
+const FloatingScreen = ({ groups, modalStaus, setModalStatus }) => {
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = () => {
@@ -40,7 +40,11 @@ const FloatingScreen = ({ groups }) => {
             backgroundColor: "red", // Set your desired background color
           }}>
           {/* Your floating screen content goes here */}
-          <SideList />
+          <SideList
+            closeDrawer={setOpen}
+            modalStaus={modalStaus}
+            setModalStatus={setModalStatus}
+          />
 
           <div className="row">
             <div className="col-2 offset-8">

@@ -4,16 +4,21 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Link } from "react-router-dom";
+import FormModal from "../group/FormModal";
 
-const SideList = () => {
+const SideList = ({ closeDrawer, modalStaus, setModalStatus }) => {
   const [expanded, setExpanded] = useState(null);
 
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : null);
   };
-
+  const handleCreateGroup = () => {
+    console.log("create a group");
+    closeDrawer(false);
+    setModalStatus(true);
+  };
   return (
-    <div className="container">
+    <div className="container  mt-2">
       <div className="row">
         <div className="col text-center">
           <div>
@@ -53,10 +58,11 @@ const SideList = () => {
       <div className="row">
         <div className="col">
           <div class="rounded-2 bg-success text-white text-center mt-2  p-2">
-            <button>Create A Group</button>
+            <button onClick={handleCreateGroup}>Create A Group</button>
           </div>
         </div>
       </div>
+      <div className="row" style={{ zIndex: "5" }}></div>
     </div>
   );
 };

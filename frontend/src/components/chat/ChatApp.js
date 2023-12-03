@@ -6,12 +6,14 @@ import io from "socket.io-client";
 
 import FloatingScreen from "./FloatingScreen";
 import { Avatar, AvatarGroup } from "@mui/material";
+import FormModal from "../group/FormModal";
 
 const ChatApp = ({ name, id, type, avatar }) => {
   const [users, setUsers] = useState([]);
   const [chat, setChat] = useState("");
   const [user, setUser] = useState("");
   const [allChat, setAllChat] = useState([]);
+  const [modalStaus, setModalStatus] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     // Connect to the server using Socket.io
@@ -52,8 +54,8 @@ const ChatApp = ({ name, id, type, avatar }) => {
       console.log(data);
       setAllChat(data);
       setUser(userName);
-    }, 10000);
-  }, [allChat]);
+    }, 100);
+  }, []);
   const hanndleSendMessage = async () => {
     if (!chat) {
       return;
@@ -133,32 +135,32 @@ const ChatApp = ({ name, id, type, avatar }) => {
   return (
     <>
       <div
-        className="container-fluid  bg-dark-subtle border border-black d-flex flex-column"
-        style={{ minHeight: "100vh", boxSizing: "border-box" }}>
+        className="container-fluid  bg-dark-subtle  -black d-flex flex-column"
+        style={{ minHeight: "100vh", boxSizing: "-box" }}>
         <div
-          className="row text-center fixed-top bg-warning-subtle"
+          className="row text-center fixed-top bg-warning-subtle "
           style={{ height: "50px" }}>
-          <div
-            className="col-auto col-md-2 m-1    text-center  d-flex justify-content-center align-items-center bg-body-tertiary "
-            style={{ borderLeft: "5px solid black" }}>
-            <FloatingScreen />
+          <div className="col-auto col-md-4 m-1    text-center  d-flex justify-content-center align-items-center bg-body-tertiary ">
+            <FloatingScreen
+              modalStaus={modalStaus}
+              setModalStatus={setModalStatus}
+            />
           </div>
-          <div className="col border  display-6 d-flex justify-content-center align-items-center">
+          <div className="col   display-6 d-flex justify-content-center align-items-center">
             {avatar && <Avatar alt="Remy Sharp" src={`${avatar}`} />}{" "}
             {name && name} {!name && "community group"}
           </div>
-          <div className="col-auto col-md-2 m-1    text-center  d-flex justify-content-center align-items-center bg-body-tertiary "></div>
         </div>
 
         <div
-          className="row shadow border border-black border border-danger "
+          className="row shadow  -black  -danger "
           style={{ marginBottom: "60px", marginTop: "48px" }}>
           {allChat.map((item, ind) => {
             return (
               <>
                 <div
                   key={item.id}
-                  className="col-12  col-md-8 offset-md-2 bg-body-secondary  "
+                  className="col-12  col-md-8 offset-md-4 bg-body-secondary  "
                   onClick={() => handleEditClick(item.id, ind)}
                   onDoubleClick={() => handleDeleteClick(item.id, ind)}>
                   <div
@@ -191,8 +193,8 @@ const ChatApp = ({ name, id, type, avatar }) => {
         <div className="row fixed-bottom  bg-body-secondary  p-2 ">
           {/* Fixed Input Box at the Bottom */}
 
-          <div className="col-12 col-md-8 offset-md-2">
-            <div className="cont border border-danger p2 bg-primary-subtle">
+          <div className="col-12 col-md-8 offset-md-4">
+            <div className="cont  -danger p2 bg-primary-subtle">
               <div className="input-group" style={{ height: "50px" }}>
                 <input
                   type="text"
@@ -204,7 +206,7 @@ const ChatApp = ({ name, id, type, avatar }) => {
                 <button
                   style={{ width: "50px" }}
                   onClick={hanndleSendMessage}
-                  className="btn btn-danger border border-black"
+                  className="btn btn-danger  -black"
                   type="button">
                   <Send />
                 </button>
@@ -213,6 +215,7 @@ const ChatApp = ({ name, id, type, avatar }) => {
           </div>
         </div>
       </div>
+      <FormModal modalStaus={modalStaus} setModalStatus={setModalStatus} />
     </>
   );
 };
