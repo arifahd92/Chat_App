@@ -42,12 +42,12 @@ app.use(groupRouter);
 //association
 //association between user and message
 User.hasMany(Message, { as: "SentMessages", foreignKey: "SenderId" });
-Message.belongsTo(User, { as: "Sender", foreignKey: "SenderId" });
+//Message.belongsTo(User, { as: "Sender", foreignKey: "SenderId" });
 User.hasMany(Message, { as: "ReceivedMessages", foreignKey: "RecipientId" });
-Message.belongsTo(User, { as: "Recipient", foreignKey: "RecipientId" });
+//Message.belongsTo(User, { as: "Recipient", foreignKey: "RecipientId" });
 //association between group and messages
 Group.hasMany(Message, { as: "GroupMessages", foreignKey: "GroupId" });
-Message.belongsTo(Group, { as: "Group", foreignKey: "GroupId" });
+//Message.belongsTo(Group, { as: "Group", foreignKey: "GroupId" });
 //association for admin
 User.hasMany(Group, { as: "admin", foreignKey: "adminId" });
 Group.belongsTo(User, { as: "admin", foreignKey: "adminId" });
@@ -56,8 +56,8 @@ Group.belongsTo(User, { as: "admin", foreignKey: "adminId" });
 Group.belongsToMany(User, { through: UserGroup, foreignKey: "groupId" });
 User.belongsToMany(Group, { through: UserGroup, foreignKey: "userId" });
 
-User.hasMany(CommonMessage);
-CommonMessage.belongsTo(User);
+User.hasMany(CommonMessage, { as: "Sender", foreignKey: "SenderId" });
+CommonMessage.belongsTo(User, { as: "Sender", foreignKey: "SenderId" });
 const users = {};
 io.on("connection", (socket) => {
   console.log(

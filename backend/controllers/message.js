@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const User = require("../modals/User");
 const Group = require("../modals/group");
 const Message = require("../modals/message");
@@ -6,6 +7,7 @@ const Message = require("../modals/message");
 async function createGroupMessage(req, res) {
   try {
     const senderId = req.userId;
+    console.log("create group message controller", { senderId });
     const recipientId = null; //as it is a group message so assign null as recipientId id
     const { text } = req.body;
     const { groupId } = req.params;
@@ -16,6 +18,7 @@ async function createGroupMessage(req, res) {
     // Check if sender   exist
     const sender = await User.findByPk(senderId);
     const isMember = await sender.hasGroup(groupId);
+    console.log({ isMember, senderId });
     const groupInstance = await Group.findByPk(groupId);
     if (!groupInstance) {
       return res.status(404).json({ error: "no group exist with this id" });
@@ -25,21 +28,18 @@ async function createGroupMessage(req, res) {
     if (!sender) {
       return res.status(404).json({ error: "Sender  not found" });
     }
-    if (adminId === req.userId || isMember) {
-      // Create the message
-      const message = await Message.create({
-        text,
-        SenderId: senderId,
-        RecipientId: recipientId,
-        GroupId: groupId,
-      });
-
-      return res.status(201).json(message);
-    } else if (!adminId || !isMember) {
-      return res
-        .status(404)
-        .json({ error: "Neither you are a member nor admin of this group" });
-    }
+    // if (adminId === req.userId || isMember) {
+    // Create the message
+    const message = await Message.create({
+      text: text,
+      isGroupMessage: true,
+      SenderId: senderId,
+      RecipientId: recipientId,
+      GroupId: groupInstance.id,
+    });
+    // const updated= await message.update({SenderId:})
+    return res.status(201).json(message);
+    //  }
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -55,7 +55,7 @@ async function getGroupMessages(req, res) {
 
     // Check if sender and recipient exist
     const sender = await User.findByPk(senderId);
-    const recipient = await User.findByPk(recipientId);
+    //const recipient = await User.findByPk(recipientId);
 
     if (!sender) {
       return res.status(404).json({ error: "unauthorize access" });
@@ -63,15 +63,23 @@ async function getGroupMessages(req, res) {
 
     // Check if the sender is a member of the group (if applicable)
 
-    const isMember = await sender.hasGroup(groupId);
-    if (!isMember) {
-      return res
-        .status(403)
-        .json({ error: "Sender is not a member of the group" });
-    }
+    //const isMember = await sender.hasGroup(groupId);
+    //if (isMember) {
+    //  return res
+    //   .status(403)
+    //  .json({ error: "Sender is not a member of the group" });
+    // }
 
     // Retrieve messages
     const messages = await Message.findAll({
+      include: [
+        {
+          model: User,
+          as: "Sender",
+          attributes: ["id", "name"], // Specify the attributes you want to include
+        },
+        // You can include the Recipient with specific attributes here if needed
+      ],
       where: {
         GroupId: groupId,
       },
@@ -150,8 +158,12 @@ const createOneOneMessage = async (req, res) => {
 //get onene message
 //m-get=>/user/message/:receiverId
 const getOneOneMessages = async (req, res) => {
+  console.log(
+    "get one one message controller called******************************"
+  );
   try {
     const senderId = req.userId;
+    console.log({ senderId });
     const groupId = null;
     const { recipientId } = req.params;
 
@@ -165,22 +177,30 @@ const getOneOneMessages = async (req, res) => {
     if (!recipient) {
       return res.status(404).json({ error: "receipent not found " });
     }
-
+    const recipientIdNum = +recipientId;
     // Retrieve messages
+    console.log(typeof recipientIdNum, typeof senderId);
     const messages = await Message.findAll({
       where: {
-        $or: [
-          { SenderId: sender.id, RecipientId: recipient.id },
-          { SenderId: recipient.id, RecipientId: sender.id },
+        [Op.or]: [
+          { SenderId: senderId, RecipientId: recipientIdNum },
+          { SenderId: recipientIdNum, RecipientId: senderId },
         ],
         GroupId: groupId,
       },
       order: [["createdAt", "ASC"]],
+      include: [
+        {
+          model: User,
+          as: "Sender",
+          attributes: ["id", "name"],
+        },
+      ],
     });
 
     return res.status(200).json(messages);
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };

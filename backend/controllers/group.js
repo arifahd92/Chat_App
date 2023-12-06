@@ -1,34 +1,44 @@
 // controllers/groupController.js
 
+const sequelize = require("../db/connection");
 const User = require("../modals/User");
 const UserGroup = require("../modals/UserGroup");
 const Group = require("../modals/group");
 
 async function createGroup(req, res) {
+  console.log(
+    "create group controller called ******************************" +
+      " " +
+      req.userId
+  );
   try {
     const adminId = req.userId;
     const { groupName, memberIds, description } = req.body;
-    console.log("create group controller");
-    console.log(req.body);
 
     // Check if the admin exists
     const admin = await User.findByPk(adminId);
 
     if (!admin) {
-      return res.status(404).json({ error: "unouthorize access" });
+      return res.status(404).json({ error: "Unauthorized access" });
     }
 
-    // Create the group with the admin as the creator
-    const group = await Group.create({
-      groupName,
-      description,
-      adminId: req.userId,
+    // Use a transaction to ensure data consistency
+    await sequelize.transaction(async (t) => {
+      // Create the group with the admin as the creator
+      const group = await Group.create(
+        {
+          groupName,
+          description,
+          adminId: req.userId,
+        },
+        { transaction: t }
+      );
+
+      // Add members to the group
+      await group.addUsers(memberIds, { transaction: t });
     });
 
-    // Add members to the group
-    await group.addUsers(memberIds);
-
-    return res.status(201).json(group);
+    return res.status(201).json({ message: "Group created successfully" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -70,6 +80,9 @@ async function getAdminGroups(req, res) {
     const user = await User.findByPk(userId);
 
     if (!user) {
+      console.log(
+        "User not found unouthorize access group controller get admin groups ***********************************8"
+      );
       return res
         .status(404)
         .json({ error: "User not found unouthorize access" });
@@ -106,7 +119,8 @@ const memberGroups = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
+    console.log("user with its member wala group");
+    // console.log(user);
     // Extract groups from the user object
     const groups = user.Groups;
 

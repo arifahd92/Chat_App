@@ -39,11 +39,8 @@ const getUser = async (req, res) => {
       "get user controller****************************************************",
       users
     );
-    if (users.length === 0) {
-      res.status(404).send({ error: "No users found" });
-    } else {
-      res.send(users);
-    }
+
+    res.send(users);
   } catch (error) {
     console.error(error.message);
     res.status(500).send({ error: `Internal server error: ${error.message}` });

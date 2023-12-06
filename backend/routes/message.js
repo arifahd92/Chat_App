@@ -12,8 +12,8 @@ const {
 
 //route for single  message (one to one chat)
 
-router.post("/user/message/:recipientId", createOneOneMessage); //to save chat i want recipientId and senderid, senderId will be taken from authorization
-router.get("/user/message/:recipientId", getOneOneMessages);
+router.post("/user/message/:recipientId", authorize, createOneOneMessage); //to save chat i want recipientId and senderid, senderId will be taken from authorization
+router.get("/user/message/:recipientId", authorize, getOneOneMessages);
 
 //route for group  message
 

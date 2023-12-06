@@ -6,9 +6,11 @@ const authorization = async (req, res, next) => {
   console.log("authorization controller*******************************");
   try {
     const token = req.headers.authorization;
+    console.log({ token });
 
     if (!token) {
       // No token provided
+      console.log("token not provided*******************************");
       return res
         .status(401)
         .json({ message: "Unauthorized - No token provided" });
@@ -31,12 +33,20 @@ const authorization = async (req, res, next) => {
     req.user = user;
 
     // Proceed to the next middleware or route handler
-    console.log("called next");
+    console.log(
+      "hurrah authorization passed ,called next*********************"
+    );
     next();
   } catch (error) {
-    console.error("Error during token verification:", error.message);
+    console.error(
+      "Error during token verification*************************:",
+      error.message
+    );
     if (error.message === "invalid token") {
-      return res.status(401).json({ message: "Unauthorized - Invalid token" });
+      return res.status(401).json({
+        message:
+          "Unauthorized - Invalid token**************************************",
+      });
     }
     return res.status(500).json({ message: "some thing went wrong" });
   }

@@ -5,12 +5,12 @@ const User = require("../modals/User");
 const postMessage = async (req, res) => {
   console.log("common message controller post message", req.userId);
   try {
-    const { message } = req.body;
-    console.log({ commonMessage: message, id: req.userId });
+    const { text } = req.body;
+    console.log({ commonMessage: text, id: req.userId });
 
     const data = await CommonMessage.create({
-      commonMessage: message,
-      userId: req.userId,
+      text,
+      SenderId: req.userId,
     });
     res.send(data);
   } catch (error) {
@@ -26,7 +26,8 @@ const getMessage = async (req, res) => {
       include: [
         {
           model: User,
-          attributes: ["name", "email"],
+          as: "Sender",
+          attributes: ["id", "name"],
         },
       ],
     });

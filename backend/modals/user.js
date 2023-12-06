@@ -1,5 +1,7 @@
 const sequelize = require("../db/connection");
 const Sequelize = require("sequelize");
+const Group = require("./group");
+const UserGroup = require("./UserGroup");
 
 const User = sequelize.define("user", {
   name: {
@@ -27,5 +29,5 @@ const User = sequelize.define("user", {
     },
   },
 });
-
+User.belongsToMany(Group, { through: UserGroup, foreignKey: "userId" });
 module.exports = User;
