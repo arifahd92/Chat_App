@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 //import 'bootstrap/dist/js/bootstrap.min.js';
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import ChatProvider from "./components/store/ChatProvider";
 
 //import PopupExample from "./components/chat/ChatUI";
 //In summary, if your project requires Popper.js for certain components (e.g., tooltips, popovers), it's advisable to
@@ -18,7 +19,9 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
     <BrowserRouter>
-      <App />
+      <ChatProvider>
+        <App />
+      </ChatProvider>
     </BrowserRouter>
   </>
 );

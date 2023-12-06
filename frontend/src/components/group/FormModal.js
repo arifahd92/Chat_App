@@ -1,10 +1,13 @@
 // MyModal.js
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
-import MyForm from "./MyForm";
+
+import GroupCreationForm from "./GroupCreationForm";
+import { ChatContext } from "../store/chat-context";
 
 const FormModal = ({ modalStaus, setModalStatus }) => {
   //const [modalShow, setModalShow] = useState(modalStaus);
+  const { createGroup } = useContext(ChatContext);
 
   return (
     <Modal show={modalStaus} onHide={() => setModalStatus(false)} centered>
@@ -12,10 +15,14 @@ const FormModal = ({ modalStaus, setModalStatus }) => {
         <Modal.Title>My Form Modal</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <MyForm />
+        <GroupCreationForm />
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary">Create Group</Button>
+        <Button
+          variant="primary"
+          onClick={() => createGroup(localStorage.getItem("userToken"))}>
+          Create
+        </Button>
       </Modal.Footer>
     </Modal>
   );

@@ -9,62 +9,85 @@ import { Avatar, AvatarGroup } from "@mui/material";
 import FormModal from "../group/FormModal";
 
 const ChatApp = ({ name, id, type, avatar }) => {
-  const [users, setUsers] = useState([]);
-  const [chat, setChat] = useState("");
-  const [user, setUser] = useState("");
+  const [users, setUsers] = useState([]); //dont think about it
+  const [chat, setChat] = useState(""); //input values
+  const [user, setUser] = useState(localStorage.getItem("userName"));
   const [allChat, setAllChat] = useState([]);
   const [modalStaus, setModalStatus] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState("");
+  const [loggedInId, setLoggedInId] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
-    // Connect to the server using Socket.io
-    const socket = io("http://localhost:4000");
-    const name = localStorage.getItem("userName");
-    setUser(name);
-
-    // Emit the "new-user-joined" event only if the user is not already in the list
-    if (!users.includes(name)) {
-      socket.emit("new-user-joined", name);
-    }
-
-    socket.on("user-joined", (newUser) => {
-      // Update the list of users only if the user is not already in the list
-      if (!users.includes(newUser)) {
-        setUsers((prevUsers) => [...prevUsers, newUser]);
-        console.log(`${newUser} joined chat`);
-      }
-    });
-
-    // Clean up the socket connection when the component unmounts
-    return () => {
-      socket.disconnect();
-    };
-  }, [users]); // Run this effect whenever the list of users changes
-  //get messages
+    setLoggedInUser(localStorage.getItem("userName"));
+    setLoggedInId(localStorage.getItem("userId"));
+    getCommunityChat();
+  }, []);
   useEffect(() => {
-    setTimeout(async () => {
+    console.log("useEffect of chat app called");
+    if (type == "user") {
+      console.log("inside tupe user=true");
+      getUserChat({ id });
+    } else if (type == "group") {
+      getGroupChat({ id });
+    } else {
+      return;
+    }
+  }, [id]);
+  async function getUserChat(obj) {
+    try {
       const token = localStorage.getItem("userToken");
       const userName = localStorage.getItem("userName");
-      const response = await axios.get("http://localhost:4000/common-message", {
-        headers: {
-          Authorization: token,
-        },
-      });
+      const response = await axios.get(
+        `http://localhost:4000/user/message/${obj.id}`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
       const data = response.data;
 
-      console.log(data);
+      console.log({ userData: data });
       setAllChat(data);
       setUser(userName);
-    }, 100);
-  }, []);
-  const hanndleSendMessage = async () => {
+    } catch (error) {
+      console.log(error.message);
+      alert(error.message);
+    }
+  }
+  async function getGroupChat(obj) {
+    try {
+      console.log("get groupchat called");
+      const token = localStorage.getItem("userToken");
+      const userName = localStorage.getItem("userName");
+      const response = await axios.get(
+        `http://localhost:4000/group/message/${obj.id}`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      const data = response.data;
+
+      console.log({ data });
+      setAllChat(data);
+      setUser(userName);
+    } catch (error) {
+      console.log(error.message);
+      alert(error.message);
+    }
+  }
+  //postGroupChat********************
+  const postGroupChat = async () => {
     if (!chat) {
       return;
     }
     try {
       const token = localStorage.getItem("userToken");
       const response = await axios.post(
-        "http://localhost:4000/common-message",
-        { message: chat },
+        `http://localhost:4000/group/message/${id}`,
+        { text: chat },
         {
           headers: {
             Authorization: `${token}`,
@@ -72,8 +95,14 @@ const ChatApp = ({ name, id, type, avatar }) => {
         }
       );
       console.log({ status: response.status });
+      console.log("data on user posting message");
+      const data = response.data;
       console.log(response.data);
       setChat(" ");
+      setAllChat([
+        ...allChat,
+        { ...data, Sender: { id: loggedInId, name: loggedInUser } },
+      ]);
     } catch (error) {
       // Handle the error
       console.log(error.response.status);
@@ -85,6 +114,117 @@ const ChatApp = ({ name, id, type, avatar }) => {
       console.error("Error:", error.message);
     }
   };
+  const postUserChat = async () => {
+    if (!chat) {
+      return;
+    }
+    try {
+      const token = localStorage.getItem("userToken");
+      const response = await axios.post(
+        `http://localhost:4000/user/message/${id}`,
+        { text: chat },
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+      console.log({ status: response.status });
+      console.log("data on user posting message");
+      const data = response.data;
+      console.log(response.data);
+      setChat(" ");
+      setAllChat([
+        ...allChat,
+        { ...data, Sender: { id: loggedInId, name: loggedInUser } },
+      ]);
+    } catch (error) {
+      // Handle the error
+      console.log(error.response.status);
+      if (error.response?.status === 401) {
+        alert("token expired login again");
+        localStorage.removeItem("userToken");
+        navigate("/");
+      }
+      console.error("Error:", error.message);
+    }
+  };
+  const postCommunityChat = async () => {
+    if (!chat) {
+      return;
+    }
+    try {
+      const token = localStorage.getItem("userToken");
+      const response = await axios.post(
+        `http://localhost:4000/common-message`,
+        { text: chat },
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+      console.log({ status: response.status });
+      console.log("data on user posting message");
+      const data = response.data;
+      console.log(response.data);
+      setChat(" ");
+      setAllChat([
+        ...allChat,
+        { ...data, Sender: { id: loggedInId, name: loggedInUser } },
+      ]);
+    } catch (error) {
+      // Handle the error
+      console.log(error.response.status);
+      if (error.response?.status === 401) {
+        alert("token expired login again");
+        localStorage.removeItem("userToken");
+        navigate("/");
+      }
+      console.error("Error:", error.message);
+    }
+  };
+  const getCommunityChat = async () => {
+    const token = localStorage.getItem("userToken");
+    console.log("get community cat called");
+    try {
+      const token = localStorage.getItem("userToken");
+      const response = await axios.get(
+        `http://localhost:4000/common-message`,
+
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+      console.log({ status: response.status });
+      console.log("");
+      const data = response.data;
+      console.log(response.data);
+      setChat(" ");
+      setAllChat(response.data);
+    } catch (error) {
+      // Handle the error
+      console.log(error.response.status);
+      if (error.response?.status === 401) {
+        alert("token expired login again");
+        localStorage.removeItem("userToken");
+        navigate("/");
+      }
+      console.error("Error:", error.message);
+    }
+  };
+  const hanndleSendMessage = async () => {
+    if (type == "user") {
+      postUserChat();
+    } else if (type == "group") {
+      postGroupChat();
+    } else {
+      postCommunityChat();
+    }
+  };
+
   // extract date
   const extractDate = (timestampString) => {
     const timestamp = new Date(timestampString);
@@ -132,6 +272,17 @@ const ChatApp = ({ name, id, type, avatar }) => {
     // You can perform any logic you need for deleting here
     console.log("Delete clicked for message:");
   };
+  const handleLogOut = () => {
+    const sure = window.confirm("Are you sure");
+    if (sure) {
+      localStorage.removeItem("userToken");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userId");
+      navigate("/");
+    } else {
+      return;
+    }
+  };
   return (
     <>
       <div
@@ -146,9 +297,23 @@ const ChatApp = ({ name, id, type, avatar }) => {
               setModalStatus={setModalStatus}
             />
           </div>
-          <div className="col   display-6 d-flex justify-content-center align-items-center">
-            {avatar && <Avatar alt="Remy Sharp" src={`${avatar}`} />}{" "}
-            {name && name} {!name && "community group"}
+          <div className="col    d-flex justify-content-between align-items-center">
+            <div className="d-flex align-items-center">
+              <div>
+                {avatar && <Avatar alt="Remy Sharp" src={`${avatar}`} />}{" "}
+              </div>{" "}
+              <div className="ms-1 lead">
+                {name && name} {!name && "community group"}
+              </div>
+            </div>
+
+            <div>
+              <button
+                className="btn btn-outline-danger me-2"
+                onClick={handleLogOut}>
+                LogOut
+              </button>
+            </div>
           </div>
         </div>
 
@@ -165,20 +330,22 @@ const ChatApp = ({ name, id, type, avatar }) => {
                   onDoubleClick={() => handleDeleteClick(item.id, ind)}>
                   <div
                     className={`card   w-75  mb-2 mt-1 ${
-                      item.user.name == user ? "float-end" : "float-start"
+                      item.Sender.name == user ? "float-end" : "float-start"
                     }`}>
                     <div
                       className={`card-header ${
-                        item.user.name == user ? "text-primary" : ""
+                        item.Sender.name == user ? "text-primary" : ""
                       }`}>
-                      <strong>{item.user.name}</strong>{" "}
+                      <span className="">
+                        {item.Sender.name == user ? "You" : item.Sender.name}
+                      </span>{" "}
                       <span className="text float-end">
                         {extractDate(item.createdAt)}
                       </span>
                     </div>
 
                     <div className="card-body">
-                      <div className="card-text">{item.commonMessage}</div>
+                      <div className="card-text">{item.text}</div>
                       <div className="  text-end">
                         {" "}
                         {extractTime(item.createdAt)}
