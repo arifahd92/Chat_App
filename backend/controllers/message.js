@@ -148,7 +148,13 @@ const createOneOneMessage = async (req, res) => {
       RecipientId: recipientId,
       GroupId: null,
     });
-
+    const socket = req.io;
+    // Handle incoming messages
+    //suppose a joind room-1, b joined room-3 now a sends message to b and emits private-message and passes recipientid 3  that message will be sent in room 3 and room 3 is joined by b
+    const receiver = await User.findByPk(senderId);
+    socket
+      .to(`user-${recipientId}`)
+      .emit("private-message", { message, receiver });
     return res.status(201).json(message);
   } catch (error) {
     console.error(error);

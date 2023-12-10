@@ -33,6 +33,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+// Pass 'io' to the controller
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 //router
 app.use(userRouter);
 app.use(messageRouter);
@@ -58,21 +63,37 @@ User.belongsToMany(Group, { through: UserGroup, foreignKey: "userId" });
 
 User.hasMany(CommonMessage, { as: "Sender", foreignKey: "SenderId" });
 CommonMessage.belongsTo(User, { as: "Sender", foreignKey: "SenderId" });
-const users = {};
+//const users = {};
 io.on("connection", (socket) => {
-  console.log(
-    " when socket event will be fired(grnerally from cliet side) it will run "
-  );
-  socket.on("new-user-joined", (name) => {
-    //in client side use emmit to trigger 'on' event
-    // Use socket.broadcast.emit to send the message to all clients except the sender
-    console.log("new user", name);
-    users[socket.id] = name;
+  console.log("User connected");
 
-    socket.broadcast.emit("user-joined", name); // use on to trigger this
-    // to get this name use socket.on('user-joined',(name)=>clg(name)) in client
+  // Handle joining a room based on user ID
+  //when user will login he will join a room followed by his userId
+  socket.on("join-private-room", (userId) => {
+    console.log("user joined its private room" + userId);
+    socket.join(`user-${userId}`);
+  });
+
+  /*
+  // Handle incoming messages
+  //suppose a joind room-1, b joined room-3 now a sends message to b and emits private-message and passes recipientid 3  that message will be sent in room 3 and room 3 is joined by b
+  socket.on("private-message", async (data) => {
+    console.log("chat message emmitted");
+    console.log(
+      `Message: ${data.chat}  ${data.recipientId}************************************************************************`
+    );
+
+    // Assuming you have user rooms, you can emit to that specific room
+    socket.to(`user-${data.recipientId}`).emit("private-message", data);
+  });
+  */
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
   });
 });
+
 sequelize
   .sync({ force: false })
   .then(() => {
