@@ -7,9 +7,7 @@ import io from "socket.io-client";
 import FloatingScreen from "./FloatingScreen";
 import { Avatar, AvatarGroup } from "@mui/material";
 import FormModal from "../group/FormModal";
-
 const ChatApp = ({ name, id, type, avatar }) => {
-  const [users, setUsers] = useState([]); //dont think about it
   const [chat, setChat] = useState(""); //input values
   const [user, setUser] = useState(localStorage.getItem("userName"));
   const [allChat, setAllChat] = useState([]);
@@ -17,22 +15,48 @@ const ChatApp = ({ name, id, type, avatar }) => {
   const [loggedInUser, setLoggedInUser] = useState("");
   const [loggedInId, setLoggedInId] = useState("");
   const navigate = useNavigate();
+  const socket = io("http://localhost:4000");
   useEffect(() => {
     setLoggedInUser(localStorage.getItem("userName"));
     setLoggedInId(localStorage.getItem("userId"));
     getCommunityChat();
+    // join a private roop followed by you userId
+    socket.emit("join-private-room", localStorage.getItem("userId"));
+    // Cleanup function to remove Socket.IO event listeners when component unmounts
   }, []);
   useEffect(() => {
+    console.log("useEffect of receiving message called*********************");
+    if (type === "user") {
+      socket.on("private-message", (data) => {
+        console.log(
+          "from socket io ****************************************************"
+        );
+        console.log(data.receiver.id, { "receipent id": id });
+        if (data.receiver.id == id) {
+          setAllChat((prevChat) => [
+            ...prevChat,
+            {
+              ...data.message,
+              Sender: { id: data.receiver.id, name: data.receiver.name },
+            },
+          ]);
+        }
+      });
+    }
+  }, [id, type, allChat]);
+
+  useEffect(() => {
     console.log("useEffect of chat app called");
-    if (type == "user") {
-      console.log("inside tupe user=true");
+    if (type === "user") {
+      console.log("inside type user=true");
       getUserChat({ id });
-    } else if (type == "group") {
+    } else if (type === "group") {
       getGroupChat({ id });
     } else {
-      return;
+      console.log("type didnt match");
     }
-  }, [id]);
+  }, [id, type]);
+
   async function getUserChat(obj) {
     try {
       const token = localStorage.getItem("userToken");
@@ -330,14 +354,16 @@ const ChatApp = ({ name, id, type, avatar }) => {
                   onDoubleClick={() => handleDeleteClick(item.id, ind)}>
                   <div
                     className={`card   w-75  mb-2 mt-1 ${
-                      item.Sender.name == user ? "float-end" : "float-start"
+                      item?.Sender?.name == user ? "float-end" : "float-start"
                     }`}>
                     <div
                       className={`card-header ${
-                        item.Sender.name == user ? "text-primary" : ""
+                        item?.Sender?.name == user ? "text-primary" : ""
                       }`}>
                       <span className="">
-                        {item.Sender.name == user ? "You" : item.Sender.name}
+                        {item?.Sender?.name == user
+                          ? "You"
+                          : item?.Sender?.name}
                       </span>{" "}
                       <span className="text float-end">
                         {extractDate(item.createdAt)}

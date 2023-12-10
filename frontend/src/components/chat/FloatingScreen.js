@@ -7,6 +7,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import SideList from "./SideList";
+import SideList2 from "./SideList2";
 const FloatingScreen = ({ groups, modalStaus, setModalStatus }) => {
   const [open, setOpen] = React.useState(false);
 
