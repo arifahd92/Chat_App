@@ -38,6 +38,7 @@ async function createGroupMessage(req, res) {
       GroupId: groupInstance.id,
     });
     // const updated= await message.update({SenderId:})
+    req.io.to(`user-${recipientId}`).emit("private-message",message );
     return res.status(201).json(message);
     //  }
   } catch (error) {
@@ -85,7 +86,7 @@ async function getGroupMessages(req, res) {
       },
       order: [["createdAt", "ASC"]],
     });
-
+  
     return res.status(200).json(messages);
   } catch (error) {
     console.error(error);
