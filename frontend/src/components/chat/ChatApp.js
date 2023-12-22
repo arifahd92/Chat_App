@@ -1,12 +1,12 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { Send } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 
 import FloatingScreen from "./FloatingScreen";
 import { Avatar, AvatarGroup } from "@mui/material";
-import FormModal from "../group/FormModal";
+const  FormModal = lazy(()=>import("../group/FormModal")) ;
 const ChatApp = ({ name, id, type, avatar }) => {
   const [chat, setChat] = useState(""); //input values
   const [user, setUser] = useState(localStorage.getItem("userName"));
@@ -408,7 +408,9 @@ const ChatApp = ({ name, id, type, avatar }) => {
           </div>
         </div>
       </div>
+      <Suspense fallback={<div>loading...</div>}>
       <FormModal modalStaus={modalStaus} setModalStatus={setModalStatus} />
+      </Suspense>
     </>
   );
 };
