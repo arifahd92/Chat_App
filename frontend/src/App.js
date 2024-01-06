@@ -14,7 +14,8 @@ export default function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Suspense fallback={<div>Loading...</div>}><Login /></Suspense>} />
+      
+  <Route path="/" element={<Suspense fallback={<div>Loading...</div>}><Login /></Suspense>} />
         <Route path="/register" element={<Suspense fallback={<div>Loading...</div>}><Signup /></Suspense>} />
 
         <Route path="/chatapp" element={<Suspense fallback={<div>Loading...</div>}><Protect Component={ChatApp} /></Suspense>} />
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/USERS/:name/:id" element={<Suspense fallback={<div>Loading...</div>}><UserChat /></Suspense>} />
         <Route path="/*" element={<Suspense fallback={<div>Loading...</div>}><ErrorPage /></Suspense>} />
       </Routes>
+      
     </>
   );
 }

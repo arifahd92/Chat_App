@@ -14,8 +14,9 @@ useEffect(() => {
       if (!users.includes(newUser)) {
         setUsers((prevUsers) => [...prevUsers, newUser]);
         console.log(`${newUser} joined chat`);
-      }
-    });
+}
+    
+    })   ;
 
     // Clean up the socket connection when the component unmounts
     return () => {

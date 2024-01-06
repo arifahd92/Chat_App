@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 dotenv.config();
+const port =process.env.PORT||4000
 const cors = require("cors");
 const sequelize = require("./db/connection");
 //router import
@@ -15,9 +16,10 @@ const socketIo = require("socket.io");
 const User = require("./modals/User");
 const Group = require("./modals/group");
 const UserGroup = require("./modals/UserGroup");
-const Message = require("./modals/Message");
+
 const CommonMessage = require("./modals/CommonMessage");
 const CommonGroup = require("./modals/CommonGroup");
+const Message = require("./modals/Message");
 
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -97,14 +99,14 @@ io.on("connection", (socket) => {
 sequelize
   .sync({ force: false })
   .then(() => {
-    server.listen(4000, (err) => {
+    server.listen(port, (err) => {
       if (err) {
         console.log(err.message);
         return;
       }
-      console.log("listening at port 4000");
+      console.log("listening at port port",port);
     });
   })
   .catch((err) => {
-    console.log(err.message);
+    console.log(err);
   });
